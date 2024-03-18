@@ -1,0 +1,8 @@
+---
+title: "Untitled"
+format: html
+editor: visual
+---
+
+# bimm143
+Class work for W24 for BIMM 143 at UCSD

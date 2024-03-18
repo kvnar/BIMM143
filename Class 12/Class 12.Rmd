@@ -1,0 +1,86 @@
+---
+title: 'Class 12: Introduction to Genome Informatics Lab'
+author: 'Kevyn Aguilar Ramirez (PID: A16321291)'
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Section 1. Proportion og G/G in population
+
+```{r}
+mxl <- read.csv("373531-SampleGenotypes-Homo_sapiens_Variation_Sample_rs8067378.csv")
+head(mxl)
+```
+
+```{r}
+table(mxl$Genotype..forward.strand.)
+```
+
+```{r}
+table(mxl$Genotype..forward.strand.)/nrow(mxl) * 100
+```
+
+
+Let's look at different population (GBR)
+```{r}
+gbr <- read.csv("373522-SampleGenotypes-Homo_sapiens_Variation_Sample_rs8067378.csv")
+```
+
+
+Find proportion of G|G
+
+```{r}
+round(table(gbr$Genotype..forward.strand.) / nrow(gbr) * 100, 2)
+```
+
+This variant that is associated with childhood asthma is more frequent in the GBR population than the MXL population.
+
+Let's now dig into this further
+
+## Section 4: Population Scale Analysis
+One sample is obviously not enough to know what is happening in a population. You are
+interested in assessing genetic differences on a population scale. 
+
+How many samples do we have?
+> Q13: Read this file into R and determine the sample size for each genotype and their
+corresponding median expression levels for each of these genotypes. 
+
+```{r}
+expr <- read.table("rs8067378_ENSG00000172057.6.txt")
+head(expr)
+```
+
+```{r}
+nrow(expr)
+```
+
+```{r}
+table(expr$geno)
+```
+> The sample sixe for A/A is 108, 233 for A/G, and 121 for G/G.
+
+```{r}
+summary(expr)
+```
+> The median expression level is 25.116.
+
+> Q14: Generate a boxplot with a box per genotype, what could you infer from the relative
+expression value between A/A and G/G displayed in this plot? Does the SNP effect the
+expression of ORMDL3?
+
+```{r}
+library(ggplot2)
+```
+
+Let's make a boxplot
+
+```{r}
+ggplot(expr) + aes(x=geno, y=exp, fill=geno) +
+  geom_boxplot(notch = TRUE)
+```
+> The expression for G/G tends to be underexpressed/lower than expression for A/A. It is possible that the SNP affects the expression of ORMDL3.
+

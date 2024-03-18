@@ -1,0 +1,130 @@
+---
+title: "Class 10: Structural Bioinformatics (Pt. 1)"
+author: "Kevyn Aguilar Ramirez (PID: A16321291)"
+format: pdf
+editor: visual
+---
+
+# 1. The PBD database
+
+Here we examine the size and composition of the main database of biomolecular structures -  the PBD.
+
+Get a CSV file from the PDB database and read it to R.
+
+Alternative link: http://tinyurl.com/pdbtable
+```{r}
+pdbstats <- read.csv("pdb_stats.csv", row.names=1)
+head(pdbstats)
+```
+
+>Q1: What percentage of structures in the PDB are solved by X-Ray and Electron Microscopy.
+
+My pdbstats data frame has numbers with commas in them. This may cause us problems. Let's see:
+```{r}
+pdbstats$X.ray
+```
+
+```{r}
+as.numeric(pdbstats$X.ray)
+```
+
+```{r}
+x <- "22,000"
+as.numeric(x) + 1
+```
+
+
+We found a function call`gsub()` now we can figure out how it works
+
+```{r}
+x <- "22,000"
+as.numeric(gsub(",","", x))
+```
+
+I can turn this snippet into a function that I can use for every column in the table
+
+```{r}
+commasum <- function(x) {
+  sum(as.numeric(gsub(",","", x)))
+}
+
+commasum(pdbstats$X.ray)
+```
+
+```{r}
+totals <- apply(pdbstats, 2, commasum)
+totals
+```
+
+```{r}
+round(totals/totals["Total"] * 100, 2)
+```
+> 84.54 + 8.72 = 93.26% of structures in the PDB are solved by X-Ray and Electron Microscopy.
+
+>Q2: What proportion of structures in the PDB are protein?
+
+```{r}
+round((commasum(pdbstats[1:3,"Total"])/totals["Total"] * 100),2)
+```
+> 97.86% of the structures in the PDB are protein
+
+>Q3: Type HIV in the PDB website search box on the home page and determine how many HIV-1 protease structures are in the current PDB?
+
+```{r}
+
+```
+
+# 2. Visualizing Protein Structure
+
+We will learn the basics of Mol* (mol-star) homepage: https://molstar.org/viewer/
+
+We will play with PBD code 1HSG
+
+![HIV-Pr with a bound inhibitor showing the two important ASP 25 amino acids](1HSG.png)
+Show the ASP 25 amino acids
+![Highlighted aspartic acid of importance ](1HSG-ASP25.png)
+
+## Back to R and working with PDB structures
+
+Predict the dynamics (flexibility) of an important protein: 
+
+```{r}
+library(bio3d)
+
+hiv <- read.pdb("1hsg")
+hiv
+```
+
+```{r}
+head(hiv$atom)
+```
+
+```{r}
+pdbseq(hiv)
+```
+
+Here we will do a Normal Mode Analysis (NMA) to predict functional motion of a kinase protein
+
+```{r}
+adk <- read.pdb("6s36")
+adk
+```
+
+```{r}
+modes <- nma(adk)
+plot(modes)
+```
+
+Make a "movie" called a trajectory of the predicted motion:
+
+```{r}
+mktrj(modes, file="adk_m7.pdb")
+```
+
+Then I can open this file in Mol*...
+
+
+
+
+
+
